@@ -107,7 +107,7 @@ def getGuess():
     while repeat:
         repeat = False
         
-        while len(guess) != 1: #always loops at least once. loops until either one letter or a word of the propper length is guessed
+        while len(guess) != 1 and len(guess) != 2: #always loops at least once. loops until either one letter or a word of the propper length is guessed
             if len(guess) == len(word):
                 if guess == word: #check if guess is correct
                     return guess
@@ -121,6 +121,12 @@ def getGuess():
         #check if player already guessed that letter 
         while guess in guesses:
             print('You already guessed that letter. Pick another: ', end='')
+            guess = input().lower()
+            repeat = True
+
+        #check if value entered is a letter
+        while not guess.isalpha():
+            print('Please enter a letter: ', end='')
             guess = input().lower()
             repeat = True
             
