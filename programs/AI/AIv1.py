@@ -15,11 +15,12 @@ class AI():
         self.minTries = math.factorial(self.actions)
         self.weight = [1] * self.stateVars
         self.stdDev = [0] * self.stateVars
-        #self.maxSim = math.factorial(self.stateVars) * self.actions + 1
-        self.maxSim = 49
+        #self.maxSim = math.factorial(self.stateVars) * self.actions + 1    ### only efficient for 6 stateVars
+        self.maxSim = 49                                                    ### need to find an equation that works for any amount of stateVars
         self.simSlope = 1 / self.maxSim
 
-    #find statistacal significance of each state element
+    #find statistacal significance of each state variable
+    #if there is a stateVar that has no correlation to the best action, I want this to give it a weight of 0
     def findWeight(self):
         states = len(self.allSteps)
 
@@ -100,11 +101,13 @@ class AI():
 
         print(str(self.weight))
 
-    #return n closest states:
+    #return n closest states to state given
+    #uses weight and stdDev to do this
     def closestStates(self, state, n):
         simStates = []
         steps = len(self.allSteps)
-        
+
+        #store the difference of each recorded state to current state in a list
         diffs = []
         for i in range(steps):
             diff = 0
@@ -112,7 +115,7 @@ class AI():
                 diff += math.fabs((self.weight[j] * ((self.allSteps[i][j]-state[j])/self.stdDev[j])))
             diffs.append(diff)
 
-        #find nth lowest diff
+        #find nth lowest diff in list
         it   = iter(diffs)
         mins = sorted(islice(it, n))
         for el in it:
@@ -121,6 +124,7 @@ class AI():
                 mins.pop()
         maxDiff = mins[-1]
 
+        #create list of closest states
         for i in range(steps):
             if diffs[i] <= maxDiff:
                 simStates.append(self.allSteps[i])
@@ -132,9 +136,11 @@ class AI():
     def getAction(self, state):
         steps = len(self.allSteps)
 
+        #formula for calculating the amount of simStates to use
         n = int((self.maxSim*((1/(self.maxSim*(1/self.simSlope)))*len(self.allSteps))/(math.sqrt((1+(1/(self.maxSim*(1/self.simSlope))*len(self.allSteps))**2)))))
         if n == 0:
             return random.randint(0,(self.actions-1))
+        #print(str(n))  ### uncomment this to see output of formula
         simStates = self.closestStates(state, n)
     
         #ensure that each action has been tried at least self.minTries
@@ -172,8 +178,9 @@ class AI():
                 else:
                     return j    
         return random.randint(0,(self.actions-1))
+
        
-            
+    #delete steps when maxData is reached        
     def deleteSteps(self):
         while len(self.allSteps) > self.maxData:
             del self.allSteps[random.randint(0,(len(self.allSteps)-1))]
@@ -200,4 +207,6 @@ class AI():
             #for any given state, the reward increases as the episode continues
             for states in range(len(self.episodeSteps)):
                 self.episodeSteps[states][self.stateVars + 1] += reward
+                
         return action
+
