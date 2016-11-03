@@ -1,6 +1,6 @@
 import pygame, sys, random, math
 from pygame.locals import *
-from AIv1 import AI
+from AIv3_001 import AI
 
 FPS = 50
 WINDOWWIDTH = 450
@@ -167,7 +167,7 @@ def main():
 
         #display episode and avg reward
         font = pygame.font.Font(None, 20)
-        epText = ("Episode: " + str(episode) + " Average reward: " + str(avg))
+        epText = ("Episode: " + str(episode) + " Reward: " + str(steps) + " Average reward: " + str(avg))
         text = font.render(epText,1,(10,10,10))
         textpos = text.get_rect()
         DISPLAYSURF.blit(text, textpos)
@@ -194,12 +194,12 @@ def main():
                 for i in range(100):
                     avg += stepsPerEpisode[-i]
                 avg = int(avg/100)
-            if avg >= 195:
-                print('episodes to solve (195 avg): ' + str(episode))
+            if episode == 150:
+                print('Avg after 150 episodes: ' + str(avg))
                 avg = 0
                 episode = 0
                 allSteps = 0
-                AI.__init__()
+                AI.__init__(2,4)
                 
                 
             steps = 0
@@ -209,5 +209,5 @@ def main():
 if __name__ == '__main__':
     cart = rectangle(center, CARTSIZE, CARTCOLOR)
     pole = rectangle((center[0], (center[1] + POLEDISPLACEMENT)), POLESIZE, POLECOLOR)
-    AI = AI()
+    AI = AI(2,4)
     main()
