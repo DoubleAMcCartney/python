@@ -158,7 +158,10 @@ def main():
 
         steps += 1
 
+        #get next action
         action = AI.getState(state, reward)
+
+        #update location of cart and angle of pole
         oldState = state
         state = step(state, action)
         x_delta = (state[0] - oldState[0]) * PIXALSPERMETER
@@ -172,13 +175,14 @@ def main():
         textpos = text.get_rect()
         DISPLAYSURF.blit(text, textpos)
 
+        #draw updated cart and pole
         moveCartPole(x_delta)
         draw(cartLocation, angle_delta)
         pygame.display.flip()
 
         reward = 1
         done = isDone(state)
-        if done:
+        if done: #if episode is over (pole fell or cart moved too far)
             state = (0, 0, 0, 0)
             cart.reset()
             pole.reset()
@@ -187,13 +191,15 @@ def main():
             allSteps += steps
             stepsPerEpisode.append(steps)
 
-            #print steps took to acheive a 195 reward avg over 100 episodes
+            #calclulate avg
             if episode <= 100:
                 avg = int(allSteps/episode)
             else:
                 for i in range(100):
                     avg += stepsPerEpisode[-i]
                 avg = int(avg/100)
+                
+            #reset and print avg after 150 episodes   
             if episode == 150:
                 print('Avg after 150 episodes: ' + str(avg))
                 avg = 0
